@@ -1,6 +1,9 @@
 use rocket;
 use rocket::State;
 use diesel::prelude::*;
+use r2d2::PooledConnection;
+use r2d2_diesel::ConnectionManager;
+use diesel::pg::PgConnection;
 
 use dotenv::dotenv;
 
@@ -14,12 +17,10 @@ use models::User;
 
 #[get("/")]
 pub fn index(db_pool: State<db::ConnectionPool>) -> Result<String> {
-  use self::schema::users::dsl::*;
-  let conn = db_pool.get().chain_err(|| "Could not establish connection")?;
-//  let conn = db_pool.get().unwrap();
+  use self::schema::users::dsl::users;
+  let conn: PooledConnection<ConnectionManager<PgConnection>> = db_pool.get().chain_err(|| "Could not establish connection")?;
 
-//  let results: Vec<User> = users.load::<User>(&*conn).chain_err(|| "Could not query DB")?;
-  let results: Vec<User> = users.load::<User>(&*conn).unwrap();
+  let results: Vec<User> = users.load::<User>(&*conn).chain_err(|| "Could not query DB")?;
 
   Ok(format!("Hello, world, {}", results.len()))
 }

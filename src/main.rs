@@ -13,7 +13,6 @@ extern crate r2d2;
 extern crate r2d2_diesel;
 extern crate dotenv;
 
-
 #[macro_use]
 extern crate error_chain;
 
