@@ -1,6 +1,5 @@
 use rocket;
 use rocket::State;
-use rocket::response::Result;
 use diesel::prelude::*;
 use rocket_contrib::JSON;
 
@@ -11,16 +10,23 @@ pub mod schema;
 pub mod errors;
 
 use models::User;
+use models::Id;
 
-#[get("/")]
-pub fn index(db_pool: State<db::ConnectionPool>) -> JSON<User> {
+use self::errors::{Result, Error, ErrorKind, ResultExt};
+
+#[get("/<id>")]
+pub fn index(db_pool: State<db::ConnectionPool>, id: Id) -> Result<JSON<User>> {
   use self::schema::users::dsl::users;
   // TODO handle errors here
-  let conn: db::DbConnection = db_pool.get().unwrap();
+//  let conn: db::DbConnection = db_pool.get().unwrap();
+  let conn: db::DbConnection = db_pool.get().chain_err(|| "Could not connect to DB")?;
 
-  let users_query: User = users.first::<User>(&*conn).unwrap();
+  let users_query: User = users
+    .find(id)
+    .first::<User>(&*conn)
+    .chain_err(|| "Could not find user")?;
 
-  JSON(users_query)
+  Ok(JSON(users_query))
 }
 
 pub fn app() -> rocket::Rocket {
