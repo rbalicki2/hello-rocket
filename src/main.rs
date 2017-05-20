@@ -1,5 +1,5 @@
 #![plugin(rocket_codegen)]
-#![feature(plugin)]
+#![feature(plugin, custom_attribute)]
 #![recursion_limit = "1024"]
 
 extern crate rocket;

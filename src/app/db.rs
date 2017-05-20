@@ -13,7 +13,7 @@ pub type DbConnection = PooledConnection<ConnectionManager<PgConnection>>;
 
 pub fn establish_connection_pool() -> ConnectionPool {
   let config = r2d2::Config::default();
-  let connection_manager = r2d2_diesel::ConnectionManager::<diesel::pg::PgConnection>::new(std::env::var("DATABASE_URL").unwrap());
+  let connection_manager = r2d2_diesel::ConnectionManager::<PgConnection>::new(std::env::var("DATABASE_URL").unwrap());
   r2d2::Pool::new(config, connection_manager).unwrap()
 }
 
