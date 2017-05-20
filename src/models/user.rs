@@ -1,5 +1,5 @@
 use models::Id;
-use app::schema::*;
+use app::schema::users;
 
 #[derive(Queryable, Serialize, Deserialize, Clone)]
 pub struct User {

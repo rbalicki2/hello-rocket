@@ -2,6 +2,9 @@
 #![feature(plugin, custom_attribute)]
 #![recursion_limit = "1024"]
 
+// https://github.com/SergioBenitez/Rocket/issues/174
+#![allow(unmounted_route)]
+
 extern crate rocket;
 extern crate rocket_contrib;
 
@@ -20,7 +23,8 @@ extern crate dotenv;
 
 pub mod app;
 pub mod models;
+pub mod routes;
 
 fn main() {
-  app::app().launch();
+  app::app(routes::routes()).launch();
 }
