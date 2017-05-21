@@ -21,6 +21,8 @@ extern crate dotenv;
 
 #[macro_use] extern crate error_chain;
 
+extern crate itertools;
+
 pub mod app;
 pub mod models;
 pub mod routes;
