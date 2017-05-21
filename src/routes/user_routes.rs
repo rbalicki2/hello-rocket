@@ -2,7 +2,7 @@ use diesel;
 use rocket_contrib::JSON;
 use rocket::State;
 use diesel::prelude::*;
-use itertools::Itertools;
+//use itertools::Itertools;
 
 use models::User;
 use models::NewUser;
@@ -46,7 +46,7 @@ pub fn get_users(db_pool: State<db::ConnectionPool>, limit_offset: LimitOffsetPa
     .load(&*conn)
     .chain_err(|| "could not load")?
     .iter()
-//    .map(|x: (User, Photo)| 42)
+    .map(|x: (User, Photo)| 42)
     .collect();
 //    .iter()
 
