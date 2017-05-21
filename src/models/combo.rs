@@ -2,48 +2,27 @@ use app::field_names::HasFieldNames;
 use rocket::request::{FromForm, FormItems};
 use std::marker::PhantomData;
 
-pub struct Combo<'f, A: 'f, B: 'f>
-  where A: FromForm<'f>, B: FromForm<'f> + HasFieldNames {
+pub struct Combo<'f, 'h, A, B>
+  where A: FromForm<'f>, B: FromForm<'h> + HasFieldNames {
   pub first: A,
   pub second: B,
-  phantom: PhantomData<&'f A>,
+  pub phantom: (PhantomData<&'f ()>, PhantomData<&'h ()>),
 }
 
-impl<'f, A, B> FromForm<'f> for Combo<'f, A, B>
-  where A: FromForm<'f>, B: FromForm<'f> + HasFieldNames {
+impl<'f, 'h, A, B> FromForm<'f> for Combo<'f, 'h, A, B>
+  where A: FromForm<'f>, B: FromForm<'h> + HasFieldNames {
   type Error = ();
 
   fn from_form_items(form_items: &mut FormItems<'f>) -> Result<Self, Self::Error> {
-//    for i in form_items {
-//      println!("{:?}", i);
-//    }
-//
-//    return Err(());
-
-//    println!("{:?}", B::field_names());
     let b_names: &'static [&'static str] = B::field_names();
 
-    let b_string: String = form_items.filter(
-      |p| b_names.contains(&p.0)
-    )
-      .map(|tuple| {
-        let mut str = tuple.0.to_owned();
-        str.push_str("=");
-        str.push_str(tuple.1);
-        str
-      })
-      .fold("".to_string(), |acc, x| {
-        let mut str: String = acc.to_owned();
-        str.push_str(&x);
-        str
-      });
+    let b_query_string: String = form_items
+      .filter(|p| b_names.contains(&p.0))
+      .map(|tuple| format!("{}={}", tuple.0, tuple.1))
+      .fold("".to_string(), |acc, x| format!("{}{}", acc, x));
 
-
-//    return Err(());
-
-//    let results_a = A::from_form_items(form_items);
-    let b_item: FormItems = FormItems::from(&b_string);
-//    let results_b = B::from_form_items(&mut FormItems::from(&b_string));
+    let b_item: &mut FormItems = &mut FormItems::from(&b_query_string[..]);
+    let results_b = B::from_form_items(b_item);
 
     return Err(());
 //
@@ -62,8 +41,6 @@ impl<'f, A, B> FromForm<'f> for Combo<'f, A, B>
 //      },
 //      Err(_) => Err(())
 //    }
-
-
   }
 }
 
