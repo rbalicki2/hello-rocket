@@ -2,15 +2,15 @@ use app::field_names::HasFieldNames;
 use rocket::request::{FromForm, FormItems};
 use std::marker::PhantomData;
 
-pub struct Combo<'f, 'h, A, B>
-  where A: FromForm<'f>, B: FromForm<'h> + HasFieldNames {
+pub struct Combo<'f, A, B>
+  where A: FromForm<'f>, B: FromForm<'f> + HasFieldNames {
   pub first: A,
   pub second: B,
-  pub phantom: (PhantomData<&'f ()>, PhantomData<&'h ()>),
+  pub phantom: PhantomData<&'f ()>,
 }
 
-impl<'f, 'h, A, B> FromForm<'f> for Combo<'f, 'h, A, B>
-  where A: FromForm<'f>, B: FromForm<'h> + HasFieldNames {
+impl<'f, A, B> FromForm<'f> for Combo<'f, A, B>
+  where A: FromForm<'f>, B: FromForm<'f> + HasFieldNames {
   type Error = ();
 
   fn from_form_items(form_items: &mut FormItems<'f>) -> Result<Self, Self::Error> {
