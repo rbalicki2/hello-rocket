@@ -14,12 +14,10 @@ pub fn get_photos_for_user(
   db_pool: State<db::ConnectionPool>,
   user: User
 ) -> Result<JSON<Vec<Photo>>> {
-  use app::schema::photos::dsl::{photos,user_id};
   let conn: db::DbConnection = db_pool.get().chain_err(|| "Could not connect to DB")?;
 
   // TODO do proper ORM stuff like user.get_photos
-  let photos_vec: Vec<Photo> = photos
-    .filter(user_id.eq(user.id))
+  let photos_vec: Vec<Photo> = Photo::belonging_to(&user)
     .load::<Photo>(&*conn)
     .chain_err(|| "Error loading photos")?;
 
