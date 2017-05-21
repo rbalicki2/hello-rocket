@@ -5,7 +5,6 @@ use diesel::prelude::*;
 
 use models::User;
 use models::NewUser;
-use models::Id;
 use models::LimitOffsetParam;
 
 use app::errors::{Result, ResultExt};
@@ -14,14 +13,6 @@ use app::schema;
 
 #[get("/users/<user>")]
 pub fn get_user(user: User) -> Result<JSON<User>> {
-//  use app::schema::users::dsl::users;
-//  let conn: db::DbConnection = db_pool.get().chain_err(|| "Could not connect to DB")?;
-
-//  let user: User = users
-//    .find(id)
-//    .first::<User>(&*conn)
-//    .chain_err(|| "Could not find user")?;
-
   Ok(JSON(user))
 }
 

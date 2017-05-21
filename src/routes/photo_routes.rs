@@ -6,8 +6,6 @@ use diesel::prelude::*;
 use models::Photo;
 use models::NewPhoto;
 use models::User;
-use models::Id;
-use models::LimitOffsetParam;
 
 use app::errors::{Result, ResultExt};
 use app::db;
@@ -18,7 +16,6 @@ pub fn get_photos_for_user(
   db_pool: State<db::ConnectionPool>,
   user: User
 ) -> Result<JSON<Vec<Photo>>> {
-  use app::schema::users::dsl::users;
   use app::schema::photos::dsl::{photos,user_id};
   let conn: db::DbConnection = db_pool.get().chain_err(|| "Could not connect to DB")?;
 
@@ -31,3 +28,18 @@ pub fn get_photos_for_user(
   Ok(JSON(photos_vec))
 }
 
+#[post("/users/<user>/photos", data="<photo_data>")]
+pub fn create_new_photo_for_user(
+  db_pool: State<db::ConnectionPool>,
+  user: User,
+  photo_data: JSON<NewPhoto>
+) -> Result<JSON<Photo>> {
+  let conn: db::DbConnection = db_pool.get().chain_err(|| "Could not connect to DB")?;
+  let insertable_photo = photo_data.0.to_insertable(user);
+  let returned_photo: Photo = diesel::insert(&insertable_photo)
+    .into(schema::photos::table)
+    .get_result(&*conn)
+    .chain_err(|| "Could not insert photo")?;
+
+  Ok(JSON(returned_photo))
+}

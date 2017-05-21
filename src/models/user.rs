@@ -5,7 +5,6 @@ use diesel::prelude::*;
 use models::Id;
 use app::schema::{users,photos};
 use app::db;
-use app::schema;
 use app::errors::{Result, ResultExt, Error};
 
 #[derive(Queryable, Serialize, Deserialize, Associations, Identifiable, Clone)]
