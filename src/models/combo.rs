@@ -2,14 +2,12 @@ use app::field_names::HasFieldNames;
 use rocket::request::{FromForm, FormItems};
 use std::marker::PhantomData;
 
-pub struct Combo<'f, A, B>
-  where A: FromForm<'f>, B: FromForm<'f> + HasFieldNames {
+pub struct Combo<A, B> {
   pub first: A,
   pub second: B,
-  pub phantom: PhantomData<&'f ()>,
 }
 
-impl<'f, A, B> FromForm<'f> for Combo<'f, A, B>
+impl<'f, A, B> FromForm<'f> for Combo<A, B>
   where A: FromForm<'f>, B: FromForm<'f> + HasFieldNames {
   type Error = ();
 
