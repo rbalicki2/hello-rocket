@@ -7,10 +7,12 @@ use models::User;
 use models::NewUser;
 use models::Id;
 use models::LimitOffsetParam;
+use models::Combo;
 
-use app::errors::{Result, Error, ErrorKind, ResultExt};
+use app::errors::{Result, ResultExt};
 use app::db;
 use app::schema;
+use app::field_names::HasFieldNames;
 
 #[get("/users/<id>")]
 pub fn get_user(db_pool: State<db::ConnectionPool>, id: Id) -> Result<JSON<User>> {
@@ -40,17 +42,25 @@ pub fn create_user(db_pool: State<db::ConnectionPool>, user_data: JSON<NewUser>)
   Ok(JSON(returned_user))
 }
 
-#[get("/users?<limit_offset>")]
-pub fn get_users(db_pool: State<db::ConnectionPool>, limit_offset: LimitOffsetParam) -> Result<JSON<Vec<User>>> {
+add_field_names! {
+  #[derive(FromForm)]
+  pub struct MyStruct {
+    pub limit: Option<u32>,
+    pub asdf: Option<u32>,
+  }
+}
+
+#[get("/users?<query_params>")]
+pub fn get_users(db_pool: State<db::ConnectionPool>, query_params: Combo<LimitOffsetParam, MyStruct>) -> Result<JSON<Vec<User>>> {
   use app::schema::users::dsl::users;
   let conn: db::DbConnection = db_pool.get().chain_err(|| "Could not connect to DB")?;
 
-  let limit: i64 = limit_offset.limit.unwrap_or(100) as i64;
-  let offset: i64 = limit_offset.limit.unwrap_or(0) as i64;
+  let limit: i64 = query_params.first.limit.unwrap_or(100) as i64;
+//  let offset: i64 = limit_offset.limit.unwrap_or(0) as i64;
 
   let users_response: Vec<User> = users
     .limit(limit)
-    .offset(offset)
+//    .offset(offset)
     .load::<User>(&*conn)
     .chain_err(|| "Could not query users")?;
 
