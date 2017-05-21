@@ -10,5 +10,6 @@ pub fn routes() -> Vec<Route> {
     user_routes::get_users,
     photo_routes::get_photos_for_user,
     photo_routes::create_new_photo_for_user,
+    photo_routes::get_photo_for_user,
   ];
 }

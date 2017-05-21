@@ -1,4 +1,3 @@
-use diesel;
 use rocket_contrib::JSON;
 use rocket::State;
 use diesel::prelude::*;
@@ -7,9 +6,8 @@ use models::Photo;
 use models::NewPhoto;
 use models::User;
 
-use app::errors::{Result, ResultExt};
+use app::errors::{Result, ResultExt, Error, ErrorKind};
 use app::db;
-use app::schema;
 
 #[get("/users/<user>/photos")]
 pub fn get_photos_for_user(
@@ -36,10 +34,18 @@ pub fn create_new_photo_for_user(
 ) -> Result<JSON<Photo>> {
   let conn: db::DbConnection = db_pool.get().chain_err(|| "Could not connect to DB")?;
   let insertable_photo = photo_data.0.to_insertable(user);
-  let returned_photo: Photo = diesel::insert(&insertable_photo)
-    .into(schema::photos::table)
-    .get_result(&*conn)
-    .chain_err(|| "Could not insert photo")?;
+  let returned_photo: Photo = insertable_photo.insert(&conn)?;
 
   Ok(JSON(returned_photo))
+}
+
+#[get("/users/<user>/photos/<photo>")]
+pub fn get_photo_for_user(
+  user: User,
+  photo: Photo
+) -> Result<JSON<Photo>> {
+  if photo.user_id != user.id {
+    return Err("Photo not found")?;
+  }
+  Ok(JSON(photo))
 }
