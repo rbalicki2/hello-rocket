@@ -11,7 +11,6 @@ use models::LimitOffsetParam;
 use app::errors::{Result, ResultExt};
 use app::db;
 use app::schema;
-use app::field_names::HasFieldNames;
 
 #[get("/users/<id>")]
 pub fn get_user(db_pool: State<db::ConnectionPool>, id: Id) -> Result<JSON<User>> {
@@ -39,14 +38,6 @@ pub fn create_user(db_pool: State<db::ConnectionPool>, user_data: JSON<NewUser>)
     .chain_err(|| "Error inserting user")?;
 
   Ok(JSON(returned_user))
-}
-
-add_field_names! {
-  #[derive(FromForm)]
-  pub struct MyStruct {
-    pub limit: Option<u32>,
-    pub asdf: Option<u32>,
-  }
 }
 
 #[get("/users?<limit_offset>")]
