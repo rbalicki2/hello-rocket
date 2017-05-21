@@ -12,8 +12,8 @@ use app::db;
 use app::schema;
 
 #[get("/users/<user>")]
-pub fn get_user(user: User) -> Result<JSON<User>> {
-  Ok(JSON(user))
+pub fn get_user(user: User) -> JSON<User> {
+  JSON(user)
 }
 
 #[post("/users", data="<user_data>")]

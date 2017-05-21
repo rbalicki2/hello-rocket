@@ -6,7 +6,7 @@ use models::Photo;
 use models::NewPhoto;
 use models::User;
 
-use app::errors::{Result, ResultExt, Error, ErrorKind};
+use app::errors::{Result,ResultExt};
 use app::db;
 
 #[get("/users/<user>/photos")]
