@@ -10,7 +10,7 @@ use models::LimitOffsetParam;
 use app::errors::{Result, ResultExt};
 use app::db;
 use app::schema;
-use app::both::{Both,NamedFields};
+use app::both::{Both,NamedFields,MyStruct1};
 
 #[get("/users/<user>")]
 pub fn get_user(user: User) -> JSON<User> {
@@ -42,7 +42,7 @@ impl NamedFields for UserNameParam {
 }
 
 #[get("/users?<query_params>")]
-pub fn get_users(db_pool: State<db::ConnectionPool>, query_params: Both<LimitOffsetParam, UserNameParam> ) -> Result<JSON<Vec<User>>> {
+pub fn get_users(db_pool: State<db::ConnectionPool>, query_params: MyStruct1<LimitOffsetParam, UserNameParam> ) -> Result<JSON<Vec<User>>> {
   use app::schema::users::dsl;
   let conn: db::DbConnection = db_pool.get().chain_err(|| "Could not connect to DB")?;
 
@@ -52,8 +52,6 @@ pub fn get_users(db_pool: State<db::ConnectionPool>, query_params: Both<LimitOff
   let users_response = dsl::users
     .offset(offset)
     .limit(limit);
-
-  println!("{}", (123,).asdf());
 
   let users_response: Vec<User> = query_params.1.name
     .map_or(

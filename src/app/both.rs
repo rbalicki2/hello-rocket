@@ -35,36 +35,35 @@ impl<'f, A, B> FromForm<'f> for Both<A, B>
   }
 }
 
-macro_rules! peel {
-    ($name:ident, $($other:ident,)*) => (combined_params! { $($other,)* })
-}
-
 macro_rules! combined_params {
   () => ();
-  ($($name:ident,)+) => {
-  // the following two lines work
-//    pub struct MyTuple<$($name,)*> ($(pub $name,)*);
-//    impl<'f, $($name:NamedFields),*> FromForm<'f> for MyStruct<$($name,)*> {
-
-  // but this one doesn't
-    impl<'f, $($name:NamedFields),*> FromForm<'f> for ($($name,)*) {
+  ($struct_name:ident; $($name:ident,)+) => {
+    pub struct $struct_name<$($name,)*> ($(pub $name,)*);
+    impl<'f, $($name),*> FromForm<'f> for $struct_name<$($name,)*>
+      where $($name: for<'x> FromForm<'x> + NamedFields),*
+    {
       type Error = ();
 
       fn from_form_items(form_items: &mut FormItems<'f>) -> Result<Self, ()> {
-        $({
-          let query_items: Vec<_> =  FormItems::from(form_items.inner_str())
+        let a = ($({
+          let query_string_items: Vec<String> =  FormItems::from(form_items.inner_str())
             .filter(|&(ref k, _)| $name::FIELDS.contains(k))
             .map(|(k, v)| format!("{}={}", k, v))
             .collect();
 
+          let query_string = query_string_items.join("&");
+          let mut items: FormItems = FormItems::from(query_string.as_str());
 
-        })*
+          let myVal = $name::from_form_items(&mut items).map_err(|_| ())?;
+          12
+        })*,);
+//        println!("{:?}", a);
         Err(())
       }
     }
-    peel! { $($name,)* }
+//    peel! { $($name,)* }
   };
 }
 
-combined_params! { T0, }
+combined_params! { MyStruct1; T0, T1, }
 //combined_params! { T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, }
