@@ -45,20 +45,20 @@ macro_rules! combined_params {
       type Error = ();
 
       fn from_form_items(form_items: &mut FormItems<'f>) -> Result<Self, ()> {
-        let a = $struct_name($({
-          {
-            let query_string_items: Vec<String> = FormItems::from(form_items.inner_str())
+        $(
+          let query_string_items: Vec<String> = FormItems::from(form_items.inner_str())
             .filter(|&(ref k, _)| $name::FIELDS.contains(k))
             .map(|(k, v)| format!("{}={}", k, v))
             .collect();
 
-            let query_string = query_string_items.join("&");
-            let mut items: FormItems = FormItems::from(query_string.as_str());
+          let query_string = query_string_items.join("&");
+          let mut items: FormItems = FormItems::from(query_string.as_str());
 
-            $name::from_form_items(&mut items).map_err(|_| ())?
-          }
-        }),*);
+          let $name = $name::from_form_items(&mut items).map_err(|_| ())?;
+        )*
+        let a = $struct_name($($name,)*);
         Ok(a)
+//        Err(())
       }
     }
   };
