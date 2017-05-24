@@ -5,6 +5,7 @@ use diesel::prelude::*;
 use models::Photo;
 use models::NewPhoto;
 use models::User;
+use models::Id;
 
 use app::errors::{Result,ResultExt};
 use app::db;
@@ -37,12 +38,12 @@ pub fn create_new_photo_for_user(
   Ok(JSON(returned_photo))
 }
 
-#[get("/users/<user>/photos/<photo>")]
+#[get("/users/<user_id>/photos/<photo>")]
 pub fn get_photo_for_user(
-  user: User,
+  user_id: Id,
   photo: Photo
 ) -> Result<JSON<Photo>> {
-  if photo.user_id != user.id {
+  if photo.user_id != user_id {
     return Err("Photo not found")?;
   }
   Ok(JSON(photo))
