@@ -46,18 +46,20 @@ macro_rules! combined_params {
 
       fn from_form_items(form_items: &mut FormItems<'f>) -> Result<Self, ()> {
         let a = ($({
-          let query_string_items: Vec<String> =  FormItems::from(form_items.inner_str())
-            .filter(|&(ref k, _)| $name::FIELDS.contains(k))
-            .map(|(k, v)| format!("{}={}", k, v))
-            .collect();
+          {
+          let query_string_items: Vec < String > = FormItems::from(form_items.inner_str())
+          .filter( | & ( ref k, _) | $ name::FIELDS.contains(k))
+          .map( | (k, v) | format ! ("{}={}", k, v))
+          .collect();
 
           let query_string = query_string_items.join("&");
           let mut items: FormItems = FormItems::from(query_string.as_str());
 
-          let myVal = $name::from_form_items(&mut items).map_err(|_| ())?;
+          let my_val = $ name::from_form_items( & mut items).map_err( | _ | ()) ?;
           12
-        })*,);
-//        println!("{:?}", a);
+          }
+        }),*);
+        println!("{:?}", a);
         Err(())
       }
     }
