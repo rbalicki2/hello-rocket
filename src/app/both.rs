@@ -42,7 +42,11 @@ macro_rules! peel {
 macro_rules! combined_params {
   () => ();
   ($($name:ident,)+) => {
+  // the following two lines work
 //    pub struct MyTuple<$($name,)*> ($(pub $name,)*);
+//    impl<'f, $($name:NamedFields),*> FromForm<'f> for MyStruct<$($name,)*> {
+
+  // but this one doesn't
     impl<'f, $($name:NamedFields),*> FromForm<'f> for ($($name,)*) {
       type Error = ();
 
