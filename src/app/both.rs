@@ -54,15 +54,39 @@ macro_rules! combined_params {
           let query_string = query_string_items.join("&");
           let mut items: FormItems = FormItems::from(query_string.as_str());
 
+          #[allow(non_snake_case)]
           let $name = $name::from_form_items(&mut items).map_err(|_| ())?;
         )*
         let a = $struct_name($($name,)*);
         Ok(a)
-//        Err(())
       }
     }
   };
 }
 
-combined_params! { MyStruct1; T0, T1, }
-//combined_params! { T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, }
+combined_params! { MyStruct2; T0, T1, }
+
+pub struct MagicTuple<T>(T);
+
+//impl<'f, T: NamedFields + FromForm<'f>> FromForm<'f> for MagicTuple<(T)> {
+//  type Error = ();
+//  fn from_form_items(form_items: &mut FormItems<'f>) -> Result<Self, ()> {
+//    println!("FROM FORM");
+//    Err(())
+//  }
+//}
+
+macro_rules! combined_params_2 {
+  () => {};
+  ($($name:ident,)+) => {
+    impl<'f, $($name: NamedFields + FromForm<'f>),*> FromForm<'f> for MagicTuple<($($name,)*)> {
+      type Error = ();
+      fn from_form_items(form_items: &mut FormItems<'f>) -> Result<Self, ()> {
+        
+        Err(())
+      }
+    }
+  }
+}
+
+combined_params_2! { T0, T1, }
