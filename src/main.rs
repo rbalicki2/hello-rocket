@@ -1,5 +1,5 @@
 #![plugin(rocket_codegen)]
-#![feature(plugin, custom_attribute, custom_derive)]
+#![feature(plugin, custom_attribute, custom_derive, associated_consts)]
 #![recursion_limit = "1024"]
 
 // https://github.com/SergioBenitez/Rocket/issues/174
