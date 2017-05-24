@@ -34,3 +34,33 @@ impl<'f, A, B> FromForm<'f> for Both<A, B>
     Ok(Both(a, b))
   }
 }
+
+macro_rules! peel {
+    ($name:ident, $($other:ident,)*) => (combined_params! { $($other,)* })
+}
+
+macro_rules! combined_params {
+  () => ();
+  ($($name:ident,)+) => {
+//    pub struct MyTuple<$($name,)*> ($(pub $name,)*);
+    impl<'f, $($name:NamedFields),*> FromForm<'f> for ($($name,)*) {
+      type Error = ();
+
+      fn from_form_items(form_items: &mut FormItems<'f>) -> Result<Self, ()> {
+        $({
+          let query_items: Vec<_> =  FormItems::from(form_items.inner_str())
+            .filter(|&(ref k, _)| $name::FIELDS.contains(k))
+            .map(|(k, v)| format!("{}={}", k, v))
+            .collect();
+
+
+        })*
+        Err(())
+      }
+    }
+    peel! { $($name,)* }
+  };
+}
+
+combined_params! { T0, }
+//combined_params! { T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, }

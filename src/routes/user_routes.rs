@@ -53,6 +53,8 @@ pub fn get_users(db_pool: State<db::ConnectionPool>, query_params: Both<LimitOff
     .offset(offset)
     .limit(limit);
 
+  println!("{}", (123,).asdf());
+
   let users_response: Vec<User> = query_params.1.name
     .map_or(
       users_response.load::<User>(&*conn),
