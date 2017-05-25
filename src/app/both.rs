@@ -17,7 +17,11 @@ impl<T> QueryParamGroup<T> {
   }
 }
 
-macro_rules! combined_params_2 {
+macro_rules! peel {
+    ($name:ident, $($other:ident,)*) => (query_param_group! { $($other,)* })
+}
+
+macro_rules! query_param_group {
   () => {};
   ($($name:ident,)+) => {
     impl<'f, $($name),*> FromForm<'f> for QueryParamGroup<($($name,)*)>
@@ -40,7 +44,9 @@ macro_rules! combined_params_2 {
         Ok(QueryParamGroup(($($name,)*)))
       }
     }
+
+    peel! { $($name,)* }
   }
 }
 
-combined_params_2! { T0, T1, }
+query_param_group! { T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, }
