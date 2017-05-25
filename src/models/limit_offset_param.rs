@@ -1,4 +1,4 @@
-use app::both;
+use app::both::NamedFields;
 
 #[derive(FromForm)]
 pub struct LimitOffsetParam {
@@ -6,6 +6,6 @@ pub struct LimitOffsetParam {
   pub offset: Option<u32>,
 }
 
-impl both::NamedFields for LimitOffsetParam {
+impl NamedFields for LimitOffsetParam {
   const FIELDS: &'static [&'static str] = &["limit", "offset"];
 }
