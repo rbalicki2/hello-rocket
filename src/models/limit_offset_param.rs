@@ -1,4 +1,4 @@
-use app::both::NamedFields;
+use query_param_group::NamedFields;
 
 #[derive(FromForm)]
 pub struct LimitOffsetParam {
