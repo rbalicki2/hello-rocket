@@ -9,6 +9,7 @@ use rocket::request::FromParam;
 
 #[derive(Queryable, Associations, Serialize, Deserialize, Identifiable, Clone)]
 #[belongs_to(User)]
+#[serde(rename_all = "camelCase")]
 pub struct Photo {
   pub id: Id,
   pub user_id: Id,
@@ -48,6 +49,7 @@ impl NewPhoto {
 
 #[table_name="photos"]
 #[derive(Insertable, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct InsertablePhoto {
   pub url: String,
   pub user_id: Id,
