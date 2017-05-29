@@ -42,7 +42,10 @@ impl NamedFields for UserNameParam {
 }
 
 #[get("/users?<query_params>")]
-pub fn get_users(db_pool: State<db::ConnectionPool>, query_params: QueryParamGroup<(LimitOffsetParam, UserNameParam)> ) -> Result<JSON<Vec<User>>> {
+pub fn get_users(
+  db_pool: State<db::ConnectionPool>,
+  query_params: QueryParamGroup<(LimitOffsetParam, UserNameParam)>
+) -> Result<JSON<Vec<User>>> {
   use app::schema::users::dsl;
   let conn: db::DbConnection = db_pool.get().chain_err(|| "Could not connect to DB")?;
 
