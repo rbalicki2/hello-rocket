@@ -18,8 +18,11 @@ pub fn get_user(user: User) -> JSON<User> {
 }
 
 #[post("/users", data="<user_data>")]
-pub fn create_user(db_pool: State<db::ConnectionPool>, user_data: JSON<NewUser>) -> Result<JSON<User>> {
-  // TODO figure out why you can't use a connection pool
+pub fn create_user(
+  db_pool: State<db::ConnectionPool>,
+  user_data: JSON<NewUser>,
+  authenticated_user: User
+) -> Result<JSON<User>> {
   let conn: db::DbConnection = db_pool.get().chain_err(|| "Could not connect to DB")?;
 
   let user: NewUser = user_data.0;

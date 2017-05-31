@@ -19,6 +19,8 @@ extern crate r2d2;
 extern crate r2d2_diesel;
 extern crate dotenv;
 
+extern crate chrono;
+
 extern crate query_param_group;
 
 #[macro_use] extern crate error_chain;
