@@ -3,8 +3,10 @@ use rocket::request::{FromParam,FromRequest,Request,Outcome};
 use rocket::outcome::Outcome::{Success,Failure};
 use rocket::http::{HeaderMap,Status};
 use diesel::prelude::*;
+use diesel::result::QueryResult;
 
 use models::Id;
+use models::OauthToken;
 use app::schema::{users,photos};
 use app::db;
 use app::errors::{Result, ResultExt, Error};
@@ -42,7 +44,7 @@ pub struct NewUser {
 impl<'a, 'r> FromRequest<'a, 'r> for User {
   type Error = ();
   fn from_request(request: &'a Request<'r>) -> Outcome<Self, ()> {
-    use app::schema::oauth_tokens::dsl::oauth_tokens;
+    use app::schema::oauth_tokens::dsl;
     let conn = db::establish_connection();
 
     let headers: &HeaderMap = request.headers();
@@ -50,10 +52,18 @@ impl<'a, 'r> FromRequest<'a, 'r> for User {
 
     match auth_header_opt {
       Some(auth) => {
-        Success(User {
-          id: 1,
-          name: "YO MAMA".to_string()
-        })
+        let actual_token: &str = &auth[7..];
+
+        let oauth_token_result: QueryResult<(OauthToken, User)> = dsl::oauth_tokens.filter(dsl::token.eq(actual_token))
+          .inner_join(users::table)
+          .first::<(OauthToken, User)>(&conn);
+
+        match oauth_token_result {
+          Ok(v) => {
+            Success(v.1)
+          },
+          Err(_) => Failure((Status::Unauthorized, ()))
+        }
       },
       None => Failure((Status::Unauthorized, ()))
     }
