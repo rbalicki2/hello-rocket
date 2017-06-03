@@ -9,8 +9,8 @@ use models::User;
 use models::Id;
 
 use app::db;
-use app::schema::{users,oauth_tokens};
-use app::errors::{Result, ResultExt, Error};
+use app::schema::oauth_tokens;
+use app::errors::{Result, ResultExt};
 
 
 #[derive(Deserialize, Clone, Debug)]
