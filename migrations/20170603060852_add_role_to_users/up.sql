@@ -1,0 +1,2 @@
+ALTER TABLE users ADD COLUMN role TEXT NOT NULL default 'admin';
+ALTER TABLE users ALTER COLUMN role DROP DEFAULT;

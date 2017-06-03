@@ -7,6 +7,7 @@ use diesel::result::QueryResult;
 
 use models::Id;
 use models::OauthToken;
+use models::UserRole;
 use app::schema::{users,photos};
 use app::db;
 use app::errors::{Result, ResultExt, Error};
@@ -16,6 +17,7 @@ use app::errors::{Result, ResultExt, Error};
 pub struct User {
   pub id: Id,
   pub name: String,
+  pub role: UserRole,
 }
 
 impl<'a> FromParam<'a> for User {
@@ -39,6 +41,7 @@ impl<'a> FromParam<'a> for User {
 #[derive(Insertable, Deserialize, Clone)]
 pub struct NewUser {
   pub name: String,
+//  pub role: UserRole,
 }
 
 impl<'a, 'r> FromRequest<'a, 'r> for User {

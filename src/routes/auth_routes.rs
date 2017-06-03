@@ -15,14 +15,14 @@ pub fn login(
   db_pool: State<db::ConnectionPool>,
   login_credentials: JSON<LoginCredential>
 ) -> Result<JSON<OauthToken>> {
-  use app::schema::oauth_tokens::dsl::oauth_tokens;
-  use app::schema::users::dsl;
+  use app::schema::oauth_tokens;
+  use app::schema::users;
 
   let name: String = login_credentials.into_inner().name;
 
   let conn: db::DbConnection = db_pool.get().chain_err(|| "Could not connect to DB")?;
 
-  let user: User = dsl::users.filter(dsl::name.eq(name))
+  let user: User = users::table.filter(users::name.eq(name))
     .first::<User>(&*conn)
     .chain_err(|| "Could not query or find user")?;
 
