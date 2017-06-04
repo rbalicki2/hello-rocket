@@ -41,16 +41,18 @@ impl fmt::Display for InvalidUserRoleError {
 //unsafe impl Sync for InvalidUserRoleError {}
 
 impl FromSqlRow<Text, Pg> for UserRole {
-  fn build_from_row<T: Row<Pg>>(row: &mut T) -> Result<Self, Box<Error + Send + Sync + 'static>> {
-    let the_error: Box<InvalidUserRoleError> = Box::new(InvalidUserRoleError());
+  fn build_from_row<T: Row<Pg>>(row: &mut T) -> Result<Self, Box<Error + Send + Sync>> {
+    let the_error: Box<Error + Send + Sync> = Box::new(InvalidUserRoleError());
+    let the_error_2: Box<Error + Send + Sync> = Box::new(InvalidUserRoleError());
+    let the_error_3: Box<Error + Send + Sync> = Box::new(InvalidUserRoleError());
 
-    let a: Result<Self, Box<Error + Send + Sync + 'static>> = row.take()
+    let a: Result<Self, Box<Error + Send + Sync>> = row.take()
       // option
       .ok_or(the_error)
       // result
-      .and_then(|val| from_utf8(val).map_err(|e| the_error))
+      .and_then(|val| from_utf8(val).map_err(|e| the_error_2))
       // result
-      .and_then(|val| UserRole::from_string(val).ok_or(the_error));
+      .and_then(|val| UserRole::from_string(val).ok_or(the_error_3));
 
     a
   }
