@@ -3,6 +3,7 @@ use diesel::row::Row;
 use std::error::Error;
 use diesel::pg::Pg;
 use std::str::from_utf8;
+use std::fmt;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub enum UserRole {
@@ -20,14 +21,29 @@ impl UserRole {
   }
 }
 
+#[derive(Debug)]
+pub struct InvalidUserRoleError(i32);
+
+impl Error for InvalidUserRoleError {
+  fn description(&self) -> &str { "Invalid user role error" }
+}
+
+impl fmt::Display for InvalidUserRoleError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "Invalid User Role")
+  }
+}
+
+unsafe impl Send for InvalidUserRoleError {}
+unsafe impl Sync for InvalidUserRoleError {}
+
 impl FromSqlRow<Text, Pg> for UserRole {
   fn build_from_row<T: Row<Pg>>(row: &mut T) -> Result<Self, Box<Error + Send + Sync>> {
     let raw_value = row.take().unwrap();
-    let raw_str = from_utf8(raw_value);
+    let raw_str: Option<UserRole> = from_utf8(raw_value)
+      .ok()
+      .and_then(UserRole::from_string);
 
-    match raw_str {
-      Ok(val) => Ok(UserRole::from_string(val).unwrap()),
-      Err(_) => panic!("i dont know how to return yet")
-    }
+    return raw_str.ok_or(Box::new(InvalidUserRoleError(1)));
   }
 }
