@@ -22,7 +22,7 @@ pub fn get_user(user: User) -> JSON<User> {
 pub fn create_user(
   db_pool: State<db::ConnectionPool>,
   user_data: JSON<NewUser>,
-  authenticated_user: AuthenticatedUser
+  _authenticated_user: AuthenticatedUser
 ) -> Result<JSON<User>> {
   let conn: db::DbConnection = db_pool.get().chain_err(|| "Could not connect to DB")?;
 

@@ -36,10 +36,6 @@ impl fmt::Display for InvalidUserRoleError {
   }
 }
 
-// seem to do nothing...?
-//unsafe impl Send for InvalidUserRoleError {}
-//unsafe impl Sync for InvalidUserRoleError {}
-
 impl FromSqlRow<Text, Pg> for UserRole {
   fn build_from_row<T: Row<Pg>>(row: &mut T) -> Result<Self, Box<Error + Send + Sync>> {
     let the_error: Box<Error + Send + Sync> = Box::new(InvalidUserRoleError());
@@ -47,33 +43,9 @@ impl FromSqlRow<Text, Pg> for UserRole {
     let the_error_3: Box<Error + Send + Sync> = Box::new(InvalidUserRoleError());
 
     let a: Result<Self, Box<Error + Send + Sync>> = row.take()
-      // option
       .ok_or(the_error)
-      // result
-      .and_then(|val| from_utf8(val).map_err(|e| the_error_2))
-      // result
+      .and_then(|val| from_utf8(val).map_err(|_| the_error_2))
       .and_then(|val| UserRole::from_string(val).ok_or(the_error_3));
-
     a
   }
 }
-
-//Compiling hello-rocket v0.1.0 (file:///Users/robertbalicki/Documents/code/hello-rocket)
-//error[E0308]: mismatched types
-//--> src/models/user_role.rs:47:63
-//   |
-//47 |       let a: Result<Self, Box<Error + Send + Sync + 'static>> = row.take()
-//   |  _______________________________________________________________^
-//48 | |       // option
-//49 | |       .ok_or(the_error)
-//50 | |       // result
-//51 | |       .and_then(|val| from_utf8(val).map_err(|e| the_error))
-//52 | |       // result
-//53 | |       .and_then(|val| UserRole::from_string(val).ok_or(the_error));
-//   | |__________________________________________________________________^ expected trait std::error::Error, found struct `models::user_role::InvalidUserRoleError`
-//   |
-//= note: expected type `std::result::Result<_, std::boxed::Box<std::error::Error + std::marker::Send + std::marker::Sync + 'static>>`
-//found type `std::result::Result<_, std::boxed::Box<models::user_role::InvalidUserRoleError>>`
-//= help: here are some functions which might fulfill your needs:
-//- .unwrap()
-//- .unwrap_err()
