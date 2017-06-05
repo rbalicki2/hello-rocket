@@ -5,7 +5,7 @@ use diesel::pg::Pg;
 use std::str::from_utf8;
 use std::fmt;
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub enum UserRole {
   Admin,
   User

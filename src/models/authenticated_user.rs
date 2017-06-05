@@ -8,6 +8,7 @@ use app::db;
 use models::OauthToken;
 use app::schema::users;
 use models::User;
+use models::UserRole;
 
 #[derive(Debug)]
 pub struct AuthenticatedUser(pub User);
@@ -40,3 +41,25 @@ impl<'a, 'r> FromRequest<'a, 'r> for AuthenticatedUser {
     }
   }
 }
+
+#[derive(Debug)]
+pub struct AuthenticatedAdminUser(pub User);
+impl <'a, 'r> FromRequest<'a, 'r> for AuthenticatedAdminUser {
+  type Error = ();
+  fn from_request(request: &'a Request<'r>) -> Outcome<Self, ()> {
+    let user_outcome = AuthenticatedUser::from_request(request);
+
+    match user_outcome {
+      Success(auth_user) => {
+        let user: User = auth_user.0;
+        if user.role == UserRole::Admin {
+          Success(AuthenticatedAdminUser(user))
+        } else {
+          Failure((Status::Forbidden, ()))
+        }
+      },
+      _ => Failure((Status::Unauthorized, ())),
+    }
+  }
+}
+
