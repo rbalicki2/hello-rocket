@@ -1,5 +1,7 @@
 use diesel::types::{Text,FromSqlRow};
 use diesel::row::Row;
+use diesel::expression::{Expression,AsExpression};
+use diesel::expression::helper_types::AsExprOf;
 use std::error::Error;
 use diesel::pg::Pg;
 use std::str::from_utf8;
@@ -18,6 +20,15 @@ impl UserRole {
       "USER" => Some(UserRole::User),
       _ => None
     }
+  }
+}
+
+impl fmt::Display for UserRole {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "{}", match *self {
+      UserRole::Admin => "ADMIN",
+      UserRole::User => "USER",
+    })
   }
 }
 
@@ -49,3 +60,21 @@ impl FromSqlRow<Text, Pg> for UserRole {
     a
   }
 }
+
+impl AsExpression<Text> for UserRole {
+  type Expression = AsExprOf<String, Text>;
+  fn as_expression(self) -> Self::Expression {
+    let s: String = self.to_string();
+    <String as AsExpression<Text>>::as_expression(s)
+  }
+}
+
+impl<'a> AsExpression<Text> for &'a UserRole {
+  type Expression = AsExprOf<String, Text>;
+  fn as_expression(self) -> Self::Expression {
+    let s: String = self.to_string();
+    <String as AsExpression<Text>>::as_expression(s)
+  }
+}
+
+

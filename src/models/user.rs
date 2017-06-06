@@ -41,7 +41,7 @@ impl<'a> FromParam<'a> for User {
 #[derive(Insertable, Deserialize, Clone)]
 pub struct NewUser {
   pub name: String,
-//  pub role: UserRole,
+  pub role: UserRole,
 }
 
 impl<'a, 'r> FromRequest<'a, 'r> for User {
