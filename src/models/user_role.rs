@@ -1,4 +1,4 @@
-use diesel::types::{Text,FromSqlRow};
+use diesel::types::{Text,FromSqlRow,Nullable};
 use diesel::row::Row;
 use diesel::expression::{Expression,AsExpression};
 use diesel::expression::helper_types::AsExprOf;
@@ -62,19 +62,37 @@ impl FromSqlRow<Text, Pg> for UserRole {
 }
 
 impl AsExpression<Text> for UserRole {
-  type Expression = AsExprOf<String, Text>;
+  type Expression = Expression<SqlType=Text>;
   fn as_expression(self) -> Self::Expression {
     let s: String = self.to_string();
-    <String as AsExpression<Text>>::as_expression(s)
+//    <String as AsExpression<Text>>::as_expression(s)
+    AsExpression::<Text>::as_expression(s)
   }
 }
 
 impl<'a> AsExpression<Text> for &'a UserRole {
-  type Expression = AsExprOf<String, Text>;
+  type Expression = Expression<SqlType=Text>;
   fn as_expression(self) -> Self::Expression {
     let s: String = self.to_string();
-    <String as AsExpression<Text>>::as_expression(s)
+//    <String as AsExpression<Text>>::as_expression(s)
+    AsExpression::<Text>::as_expression(s)
   }
 }
 
+// Adding the following two takes us from 12 errors to 7:
 
+impl AsExpression<Nullable<Text>> for UserRole {
+  type Expression = Expression<SqlType=Nullable<Text>>;
+
+  fn as_expression(self) -> Self::Expression {
+    AsExpression::<Nullable<Text>>::as_expression(self.to_string())
+  }
+}
+
+impl<'a> AsExpression<Nullable<Text>> for &'a UserRole {
+  type Expression = Expression<SqlType=Nullable<Text>>;
+
+  fn as_expression(self) -> Self::Expression {
+    AsExpression::<Nullable<Text>>::as_expression(self.to_string())
+  }
+}
