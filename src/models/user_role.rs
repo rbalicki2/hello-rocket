@@ -81,8 +81,6 @@ impl<'a> AsExpression<Text> for &'a UserRole {
   }
 }
 
-// Adding the following two takes us from 12 errors to 7:
-
 impl AsExpression<Nullable<Text>> for UserRole {
 //  type Expression = Expression<SqlType=Nullable<Text>>;
   type Expression = AsExprOf<String, Nullable<Text>>;
