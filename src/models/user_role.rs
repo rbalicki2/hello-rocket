@@ -32,8 +32,6 @@ impl fmt::Display for UserRole {
   }
 }
 
-// I create my own error because I couldn't figure out what kind
-// of boxed error I could return from build_from_row otherwise.
 #[derive(Debug)]
 pub struct InvalidUserRoleError();
 
@@ -61,28 +59,7 @@ impl FromSqlRow<Text, Pg> for UserRole {
   }
 }
 
-impl AsExpression<Text> for UserRole {
-//  type Expression = Expression<SqlType=Text>;
-  type Expression = AsExprOf<String, Text>;
-  fn as_expression(self) -> Self::Expression {
-    let s: String = self.to_string();
-//    <String as AsExpression<Text>>::as_expression(s)
-    AsExpression::<Text>::as_expression(s)
-  }
-}
-
-impl<'a> AsExpression<Text> for &'a UserRole {
-//  type Expression = Expression<SqlType=Text>;
-  type Expression = AsExprOf<String, Text>;
-  fn as_expression(self) -> Self::Expression {
-    let s: String = self.to_string();
-//    <String as AsExpression<Text>>::as_expression(s)
-    AsExpression::<Text>::as_expression(s)
-  }
-}
-
 impl AsExpression<Nullable<Text>> for UserRole {
-//  type Expression = Expression<SqlType=Nullable<Text>>;
   type Expression = AsExprOf<String, Nullable<Text>>;
 
   fn as_expression(self) -> Self::Expression {
@@ -91,7 +68,6 @@ impl AsExpression<Nullable<Text>> for UserRole {
 }
 
 impl<'a> AsExpression<Nullable<Text>> for &'a UserRole {
-//  type Expression = Expression<SqlType=Nullable<Text>>;
   type Expression = AsExprOf<String, Nullable<Text>>;
 
   fn as_expression(self) -> Self::Expression {
