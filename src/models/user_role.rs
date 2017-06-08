@@ -49,14 +49,14 @@ impl fmt::Display for InvalidUserRoleError {
 
 impl FromSqlRow<Text, Pg> for UserRole {
   fn build_from_row<T: Row<Pg>>(row: &mut T) -> Result<Self, Box<Error + Send + Sync>> {
-    let the_error: Box<Error + Send + Sync> = Box::new(InvalidUserRoleError());
-    let the_error_2: Box<Error + Send + Sync> = Box::new(InvalidUserRoleError());
-    let the_error_3: Box<Error + Send + Sync> = Box::new(InvalidUserRoleError());
+    fn error() -> Box<Error + Send + Sync> {
+      Box::new(InvalidUserRoleError())
+    }
 
     let a: Result<Self, Box<Error + Send + Sync>> = row.take()
-      .ok_or(the_error)
-      .and_then(|val| from_utf8(val).map_err(|_| the_error_2))
-      .and_then(|val| UserRole::from_string(val).ok_or(the_error_3));
+      .ok_or_else(error)
+      .and_then(|val| from_utf8(val).map_err(|_| error()))
+      .and_then(|val| UserRole::from_string(val).ok_or_else(error));
     a
   }
 }
